@@ -1,0 +1,340 @@
+swagger: "2.0"
+info:
+  title: MCP Translation Service
+  description: Service de traduction avec blobs pré-uploadés
+  version: 2.0.0
+host: translation-mcp.jollybeach-59224d05.francecentral.azurecontainerapps.io
+basePath: /
+schemes:
+  - https
+consumes:
+  - application/json
+  - application/x-www-form-urlencoded
+produces:
+  - application/json
+paths:
+  /health:
+    get:
+      summary: Test service
+      operationId: HealthCheck
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              service:
+                type: string
+              timestamp:
+                type: string
+  /files:
+    get:
+      summary: Lister fichiers disponibles
+      operationId: ListAvailableFiles
+      parameters:
+        - name: extension
+          in: query
+          required: false
+          type: string
+          description: Filtrer par extension (pdf, docx, txt, etc.)
+      responses:
+        "200":
+          description: Liste des fichiers
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              files:
+                type: array
+                items:
+                  type: string
+              count:
+                type: integer
+              container:
+                type: string
+              filter_extension:
+                type: string
+  /translate:
+    post:
+      summary: Traduire un fichier déjà uploadé
+      operationId: TranslateDocument
+      consumes:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            required:
+              - blob_name
+              - target_language
+              - user_id
+            properties:
+              blob_name:
+                type: string
+                description: Nom du fichier dans le container doc-to-trad
+                example: "rapport_annuel.pdf"
+              target_language:
+                type: string
+                description: Code langue cible
+                enum:
+                  - fr
+                  - en
+                  - es
+                  - de
+                  - it
+                  - pt
+                  - ru
+                  - ja
+                  - ko
+                  - zh
+                  - ar
+                example: "en"
+              user_id:
+                type: string
+                description: Identifiant unique de l'utilisateur
+                example: "user123"
+      responses:
+        "200":
+          description: Traduction lancée avec succès
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              translation_id:
+                type: string
+              message:
+                type: string
+              status:
+                type: string
+              target_language:
+                type: string
+              estimated_time:
+                type: string
+        "404":
+          description: Fichier non trouvé
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              error:
+                type: string
+        "400":
+          description: Paramètre manquant
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              error:
+                type: string
+        "500":
+          description: Erreur serveur
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              error:
+                type: string
+  /status/{translation_id}:
+    get:
+      summary: Vérifier le statut d'une traduction
+      operationId: CheckStatus
+      parameters:
+        - name: translation_id
+          in: path
+          required: true
+          type: string
+          description: ID de la traduction à vérifier
+      responses:
+        "200":
+          description: Statut de la traduction
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              translation_id:
+                type: string
+              status:
+                type: string
+                enum:
+                  - "En cours"
+                  - "InProgress"
+                  - "Succeeded"
+                  - "Failed"
+                  - "Cancelled"
+              blob_name:
+                type: string
+              target_language:
+                type: string
+              user_id:
+                type: string
+              started_at:
+                type: string
+              last_checked:
+                type: string
+        "404":
+          description: Traduction non trouvée
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              error:
+                type: string
+        "500":
+          description: Erreur serveur
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              error:
+                type: string
+  /result/{translation_id}:
+    get:
+      summary: Récupérer le fichier traduit
+      operationId: GetResult
+      parameters:
+        - name: translation_id
+          in: path
+          required: true
+          type: string
+          description: ID de la traduction terminée
+        - name: save_to_onedrive
+          in: query
+          required: false
+          type: boolean
+          default: true
+          description: Sauvegarder sur OneDrive
+      responses:
+        "200":
+          description: Fichier traduit récupéré
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              file_content_base64:
+                type: string
+              download_url:
+                type: string
+              onedrive_url:
+                type: string
+              translated_filename:
+                type: string
+        "404":
+          description: Traduction non trouvée ou fichier non disponible
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              error:
+                type: string
+        "500":
+          description: Erreur serveur
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              error:
+                type: string
+  /translations:
+    get:
+      summary: Lister les traductions actives
+      operationId: ListActiveTranslations
+      responses:
+        "200":
+          description: Liste des traductions en cours
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              active_translations:
+                type: object
+              count:
+                type: integer
+definitions:
+  TranslationRequest:
+    type: object
+    required:
+      - blob_name
+      - target_language
+      - user_id
+    properties:
+      blob_name:
+        type: string
+        description: Nom du fichier dans le container doc-to-trad
+        example: "document.pdf"
+      target_language:
+        type: string
+        description: Code langue cible
+        enum: [fr, en, es, de, it, pt, ru, ja, ko, zh, ar]
+        example: "en"
+      user_id:
+        type: string
+        description: Identifiant unique de l'utilisateur
+        example: "user123"
+  TranslationResponse:
+    type: object
+    properties:
+      success:
+        type: boolean
+      translation_id:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+      target_language:
+        type: string
+      estimated_time:
+        type: string
+  StatusResponse:
+    type: object
+    properties:
+      success:
+        type: boolean
+      translation_id:
+        type: string
+      status:
+        type: string
+      blob_name:
+        type: string
+      target_language:
+        type: string
+      user_id:
+        type: string
+      started_at:
+        type: string
+      last_checked:
+        type: string
+  ErrorResponse:
+    type: object
+    properties:
+      success:
+        type: boolean
+      error:
+        type: string
+parameters: {}
+responses: {}
+securityDefinitions: {}
+security: []
+tags:
+  - name: Translation
+    description: Opérations de traduction
+  - name: Files
+    description: Gestion des fichiers
+  - name: Health
+    description: Santé du service

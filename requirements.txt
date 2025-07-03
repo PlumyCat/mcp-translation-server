@@ -1,0 +1,21 @@
+# Serveur web
+aiohttp>=3.9.0
+aiohttp-cors>=0.7.0
+
+# MCP (Model Context Protocol)
+mcp>=1.0.0
+
+# Dépendances Azure
+azure-storage-blob>=12.19.0
+azure-identity>=1.15.0
+requests>=2.31.0
+
+# Dépendances Python
+python-dotenv>=1.0.0
+pydantic>=2.5.0
+
+# Dépendances MS Graph
+msal>=1.26.0
+
+# Utilitaires
+asyncio-throttle>=1.0.0

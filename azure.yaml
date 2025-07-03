@@ -1,0 +1,25 @@
+# Azure Developer CLI (azd) configuration
+name: translation-mcp
+metadata:
+  template: translation-mcp@1.0.0
+
+services:
+  api:
+    project: .
+    language: python
+    host: containerapp
+
+hooks:
+  predeploy:
+    shell: pwsh
+    run: |
+      Write-Host "🔍 Vérification de la configuration..."
+      if (-not (Test-Path ".env")) {
+        Write-Host "❌ Fichier .env manquant. Créez le fichier .env avec vos clés Azure"
+        exit 1
+      }
+      Write-Host "✅ Configuration vérifiée"
+      Write-Host "🚀 Déploiement vers Azure Container Apps..."
+      Write-Host "   📦 Container App: translation-mcp"
+      Write-Host "   🏷️  Resource Group: GRChatGPT" 
+      Write-Host "   📋 Registry: repodemoeric"

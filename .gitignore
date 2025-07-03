@@ -1,0 +1,74 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# Environment Variables
+.env
+.env.local
+.env.production
+.env.development
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Archive and docs
+archive/
+*.md
+!README.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Autres
+power-apps-connector.json
+power-apps-connector-simplified.json
+
+# Scripts and non-essential files
+scripts/
+add_env_vars.ps1
+cleanup_project.ps1
+deploy_azure.ps1
+get_app_info.ps1
+list_essential_files.ps1
+monitor_app.ps1
+test_download_complete.ps1
+test_url_access.ps1
+upload_test_file.py
+MIGRATION_POWER_APPS.md
+NOUVELLE_LOGIQUE.md
+QUICKSTART.md
+README_CLEAN.md
+Solutions pour le traitement des pièces jointes avec MCP dans Copilot Studio.md
